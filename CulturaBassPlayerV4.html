@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cultura Bass Record Pool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0c0c0c;
+      --secondary: #1a1a1a;
+      --accent: #e63946;
+      --text: #f1faee;
+    }
+    
+    /* Custom scrollbar styling */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #e63946;
+      border-radius: 4px;
+      border: 2px solid #1a1a1a;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #f15b67;
+    }
+    
+    /* Firefox scrollbar */
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #e63946 #1a1a1a;
+    }
+    
+    .favorite-track {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .favorite-track:hover .track-actions {
+      transform: translateX(0);
+    }
+    
+    .track-actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(40, 40, 40, 0.8) 30%, rgba(40, 40, 40, 1) 100%);
+      padding: 0.5rem 0.5rem 0.5rem 2rem;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .playing-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #e63946;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+    
+    .glowing-border {
+      box-shadow: 0 0 15px rgba(230, 57, 70, 0.7);
+    }
+    
+    .track-playing {
+      background: linear-gradient(90deg, rgba(20, 20, 20, 0.8) 0%, rgba(20, 20, 20, 1) 100%);
+      border-left: 3px solid var(--accent);
+    }
+    
+    .logo-container {
+      background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+      border-radius: 12px;
+      padding: 12px 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+    
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 1.8rem;
+      background: linear-gradient(to right, #f1faee, #a8dadc, #457b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+    
+    .logo-subtext {
+      font-family: 'Roboto', sans-serif;
+      letter-spacing: 3px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: #a8dadc;
+    }
+    
+    .month-header {
+      background: linear-gradient(to right, var(--secondary), var(--primary));
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 15px 0 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #f1faee;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .filter-header {
+      color: #a8dadc;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      font-weight: 500;
+      display: inline-block;
+      margin-right: 12px;
+    }
+    
+    .filter-section {
+      background: rgba(12, 12, 12, 0.7);
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #333;
+    }
+    
+    .date-btn {
+      background: rgba(26, 26, 26, 0.7);
+      border: 1px solid #333;
+      color: #cbd5e1;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      margin: 0 3px;
+    }
+    
+    .date-btn:hover, .date-btn.active {
+      background: linear-gradient(to right, var(--accent), #f15b67);
+      color: var(--primary);
+      border-color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .search-highlight {
+      background-color: rgba(230, 57, 70, 0.3);
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+    
+    .artwork {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      margin-right: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+      background: var(--primary);
+    }
+    
+    .artwork:hover {
+      transform: scale(1.05);
+    }
+    
+    .player-artwork {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      margin-right: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      background: var(--primary);
+    }
+    
+    .placeholder-artwork {
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    
+    .track-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .play-btn {
+      transition: all 0.2s;
+    }
+    
+    .play-btn:hover {
+      transform: scale(1.1);
+      color: var(--accent);
+    }
+    
+    .volume-container:hover .volume-slider {
+      opacity: 1;
+    }
+    
+    .tag-btn {
+      padding: 2px 8px;
+      font-size: 0.8rem;
+    }
+    
+    .filter-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .date-filter-container {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+    
+    .tag-token {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(230, 57, 70, 0.2);
+      border: 1px solid rgba(230, 57, 70, 0.5);
+      color: #a8dadc;
+      border-radius: 15px;
+      padding: 2px 8px;
+      margin: 2px;
+      font-size: 0.8rem;
+    }
+    
+    .tag-token button {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      cursor: pointer;
+      margin-left: 4px;
+      font-size: 0.9rem;
+    }
+    
+    .tag-token button:hover {
+      color: #fff;
+    }
+    
+    .tag-limit-message {
+      color: #f87171;
+      font-size: 0.75rem;
+      margin-left: 10px;
+      display: none;
+    }
+    
+    /* Icon styles */
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+    
+    /* Scrollable sections */
+    .scrollable-section {
+      height: calc(100vh - 290px);
+      overflow-y: auto;
+    }
+    
+    .now-playing-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .now-playing-meta {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #a8dadc;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-left: 8px;
+    }
+    
+    .service-buttons {
+      display: flex;
+      gap: 5px;
+      margin-left: 5px;
+      padding-left: 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Modern button styles */
+    .modern-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      outline: none;
+    }
+    
+    .modern-btn i {
+      margin-right: 6px;
+      font-size: 0.9rem;
+    }
+    
+    .modern-btn-primary {
+      background: linear-gradient(135deg, #e63946, #f15b67);
+      color: white;
+      box-shadow: 0 4px 6px rgba(230, 57, 70, 0.3);
+    }
+    
+    .modern-btn-primary:hover {
+      background: linear-gradient(135deg, #f15b67, #e63946);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(230, 57, 70, 0.4);
+    }
+    
+    .modern-btn-warning {
+      background: linear-gradient(135deg, #e9c46a, #f4a261);
+      color: #1a1a1a;
+      box-shadow: 0 4px 6px rgba(233, 196, 106, 0.3);
+    }
+    
+    .modern-btn-warning:hover {
+      background: linear-gradient(135deg, #f4a261, #e9c46a);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(233, 196, 106, 0.4);
+    }
+    
+    .modern-btn-danger {
+      background: linear-gradient(135deg, #e63946, #d90429);
+      color: white;
+      box-shadow: 0 4px 6px rgba(230, 57, 70, 0.3);
+    }
+    
+    .modern-btn-danger:hover {
+      background: linear-gradient(135deg, #d90429, #e63946);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(230, 57, 70, 0.4);
+    }
+    
+    /* Card styling */
+    .card {
+      background: rgba(26, 26, 26, 0.7);
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #333;
+      margin-bottom: 15px;
+    }
+    
+    .card-header {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #f1faee;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #333;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .flex-col-reverse {
+        flex-direction: column-reverse;
+      }
+      
+      .w-1\/3, .w-2\/3 {
+        width: 100%;
+      }
+      
+      .border-l {
+        border-left: none;
+        border-top: 1px solid #333;
+        padding-top: 20px;
+      }
+      
+      .scrollable-section {
+        height: 50vh;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white" style="font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%); min-height: 100vh; display: flex; flex-direction: column;">
+  <!-- App Container -->
+  <div id="app-container" style="flex: 1; padding-bottom: 90px;">
+    <!-- Header with logo -->
+    <div class="p-4 flex flex-col md:flex-row justify-between items-center border-b border-gray-800">
+      <div class="flex-1 w-full mb-4 md:mb-0">
+        <div class="relative">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search by title, artist, remixer, tags..."
+            class="w-full p-3 pl-12 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 transition"
+            autocomplete="off"
+          />
+          <div class="absolute left-4 top-3.5 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <button id="clear-search" class="absolute right-4 top-3.5 text-gray-400 hover:text-white transition hidden">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-3 flex flex-wrap items-center">
+          <div class="text-xs text-gray-400 mr-2">Selected tags:</div>
+          <div id="selected-tags" class="flex flex-wrap gap-1"></div>
+          <div id="tag-limit-message" class="tag-limit-message">Max 3 tags selected</div>
+        </div>
+        <div id="tag-buttons" class="mt-3 flex flex-wrap gap-2"></div>
+      </div>
+      
+      <!-- Logo -->
+      <div class="logo-container flex items-center mt-4 md:mt-0 md:ml-6">
+        <div>
+          <div class="logo-text">Cultura Bass</div>
+          <div class="logo-subtext">Record Pool</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="px-4 pb-3">
+      <div class="filter-section">
+        <div class="filter-container">
+          <div class="filter-header">Filter by Date</div>
+          <div class="flex flex-wrap gap-1" id="date-filters">
+            <button class="date-btn active" data-date="">All</button>
+            <!-- Dates will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex flex-col md:flex-row flex-1 min-h-0">
+      <!-- Playlist Section -->
+      <div class="w-full md:w-2/3 p-4 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold" style="font-family: 'Montserrat', sans-serif;">All Tracks</h2>
+          <div class="text-sm text-gray-400">
+            <span id="track-count">0</span> tracks
+          </div>
+        </div>
+        <div id="tracks-container" class="scrollable-section overflow-y-auto custom-scrollbar"></div>
+      </div>
+
+      <!-- Favorites Section -->
+      <div class="w-full md:w-1/3 p-4 md:border-l border-gray-700 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold" style="font-family: 'Montserrat', sans-serif;">Favorites</h2>
+          <div class="text-sm text-gray-400">
+            <span id="favorite-count">0</span> tracks
+          </div>
+        </div>
+        
+        <!-- Folder Management Card -->
+        <div class="card mb-4">
+          <div class="card-header">Manage Folders</div>
+          <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex-1">
+              <input
+                id="new-folder-name"
+                type="text"
+                class="w-full bg-gray-800 text-white p-2.5 rounded border border-gray-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 transition"
+                placeholder="New folder name"
+                autocomplete="off"
+              />
+            </div>
+            <button onclick="addFavoriteFolder()" class="modern-btn modern-btn-primary">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
+          
+          <div class="mt-4 flex flex-col md:flex-row gap-3">
+            <select
+              id="favorite-folder-select"
+              class="flex-1 bg-gray-800 text-white p-2.5 rounded border border-gray-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/50 transition"
+              onchange="changeActiveFolder(this.value)"
+            >
+              <option value="" disabled selected>Select favorite folder</option>
+            </select>
+            
+            <button
+              id="rename-folder-btn"
+              class="modern-btn modern-btn-warning"
+              onclick="renameActiveFolder()"
+              disabled
+            >
+              <i class="fas fa-edit"></i> Rename
+            </button>
+            
+            <button
+              id="delete-folder-btn"
+              class="modern-btn modern-btn-danger"
+              onclick="deleteActiveFolder()"
+              disabled
+            >
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+        
+        <div
+          id="favorite-tracks"
+          class="scrollable-section overflow-y-auto flex-grow space-y-2 custom-scrollbar"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Player with Artwork -->
+  <div
+    class="fixed bottom-0 left-0 w-full bg-gray-800 p-4 flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0 md:space-x-4 glowing-border"
+    style="max-height: 90px; background: linear-gradient(135deg, #1a1a1a 0%, #0c0c0c 100%);"
+  >
+    <div id="player-info" class="flex-1 flex items-center now-playing-info">
+      <div id="player-artwork" class="player-artwork">
+        <img id="player-artwork-img" src="https://imagizer.imageshack.com/v2/xq70/924/CCjSpv.png" class="w-full h-full object-cover rounded" alt="Album Artwork">
+      </div>
+      <div class="ml-3">
+        <div class="flex items-center">
+          <div class="playing-indicator mr-2" id="playing-indicator"></div>
+          <div id="current-track-info" class="font-medium">No track playing</div>
+        </div>
+        <div id="player-artist" class="text-sm text-gray-300">Select a track to play</div>
+        <div id="player-meta" class="now-playing-meta">
+          <span id="player-bpm">0 BPM</span>
+          <span> • </span>
+          <span id="player-tags"></span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex flex-col items-center w-full md:w-auto">
+      <div class="flex items-center space-x-4">
+        <button
+          id="player-toggle"
+          class="icon-btn text-amber-400 hover:text-amber-300"
+          title="Play/Pause"
+          aria-label="Play/Pause"
+        >
+          <svg id="play-icon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg id="pause-icon" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+      </div>
+      <div id="player-time" class="text-sm font-mono select-none mt-1">0:00 / 0:00</div>
+    </div>
+    
+    <div class="flex flex-col items-center w-full md:w-64">
+      <input
+        id="progress-bar"
+        type="range"
+        min="0"
+        max="100"
+        value="0"
+        step="0.1"
+        class="w-full cursor-pointer"
+        aria-label="Progress Bar"
+      />
+    </div>
+    
+    <div class="flex flex-wrap gap-4 items-center justify-center w-full md:w-auto">
+      <div class="volume-container flex items-center group">
+        <svg class="icon mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <input
+          id="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="1"
+          class="w-24 cursor-pointer volume-slider opacity-70 group-hover:opacity-100 transition-opacity"
+          aria-label="Volume Slider"
+        />
+        <span id="volume-percentage" class="ml-2 text-sm w-8">100%</span>
+      </div>
+      
+      <div class="flex space-x-3">
+        <select id="playback-speed" class="bg-gray-700 text-white p-1 rounded text-sm">
+          <option value="0.5">0.5x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1" selected>1.0x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2.0x</option>
+        </select>
+        
+        <button
+          id="player-download"
+          class="icon-btn hover:text-green-400"
+          title="Download"
+          aria-label="Download Track"
+        >
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+        <button
+          id="player-favorite"
+          class="icon-btn hover:text-red-400"
+          title="Add/Remove Favorite"
+          aria-label="Toggle Favorite"
+        >
+          <svg id="favorite-outline" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <svg id="favorite-filled" class="icon hidden" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const playlistEl = document.getElementById("tracks-container");
+    const favoriteTracks = document.getElementById("favorite-tracks");
+    const favoriteFoldersSelect = document.getElementById("favorite-folder-select");
+    const deleteFolderBtn = document.getElementById("delete-folder-btn");
+    const renameFolderBtn = document.getElementById("rename-folder-btn");
+    const searchInput = document.getElementById("search-input");
+    const tagButtonsEl = document.getElementById("tag-buttons");
+    const clearSearchBtn = document.getElementById("clear-search");
+    const trackCountEl = document.getElementById("track-count");
+    const favoriteCountEl = document.getElementById("favorite-count");
+    const dateFilters = document.getElementById("date-filters");
+    const selectedTagsContainer = document.getElementById("selected-tags");
+    const tagLimitMessage = document.getElementById("tag-limit-message");
+
+    const playerInfo = document.getElementById("current-track-info");
+    const playerArtist = document.getElementById("player-artist");
+    const playerArtworkImg = document.getElementById("player-artwork-img");
+    const playerTime = document.getElementById("player-time");
+    const progressBar = document.getElementById("progress-bar");
+    const playerToggle = document.getElementById("player-toggle");
+    const volumeSlider = document.getElementById("volume-slider");
+    const volumePercentage = document.getElementById("volume-percentage");
+    const playerDownload = document.getElementById("player-download");
+    const playerFavorite = document.getElementById("player-favorite");
+    const playingIndicator = document.getElementById("playing-indicator");
+    const playbackSpeed = document.getElementById("playback-speed");
+    const playIcon = document.getElementById("play-icon");
+    const pauseIcon = document.getElementById("pause-icon");
+    const favoriteOutline = document.getElementById("favorite-outline");
+    const favoriteFilled = document.getElementById("favorite-filled");
+    const playerBpm = document.getElementById("player-bpm");
+    const playerTags = document.getElementById("player-tags");
+
+    let activeFolder = null;
+    let favoriteFolders = {};
+    let selectedDate = "";
+    let selectedTags = [];
+
+    // Album artwork placeholder
+    const placeholderArtwork = "https://imagizer.imageshack.com/v2/xq70/924/CCjSpv.png";
+
+    const tracks = [
+      {
+        id: "1",
+        title: "Espresso (Erick Jaimez Remix)",
+        artist: "Sabrina Carpenter",
+        remixer: "Erick Jaimez",
+        bpm: 104,
+        date: "06/25",
+        tags: ["Afro", "MP3"],
+        url: "https://www.mediafire.com/file_premium/jbm6sd6hcsg4pvr/Sabrina_Carpenter_-_Espresso_%2528Erick_Jaimez_Remix%2529.wav/file",
+        artwork: "https://imagizer.imageshack.com/img922/3086/7LXgHA.png",
+        spotifyUrl: "https://open.spotify.com/track/1x5zO8FZ5hTUn5aRha5h25",
+        appleMusicUrl: "https://music.apple.com/us/album/espresso-single/1728882696"
+      },
+      {
+        id: "2",
+        title: "All Night feat. Antepek",
+        artist: "Erick Jaimez",
+        remixer: "",
+        bpm: 125,
+        date: "06/25",
+        tags: ["Tribal", "MP3"],
+        url: "https://www.mediafire.com/file_premium/e3sw04v04jextsj/All_Night_Antepek_%2526_Erick_Jaimez_V6.mp3/file",
+        artwork: "https://imagizer.imageshack.com/img922/3086/7LXgHA.png",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "3",
+        title: "Eoo (Erick Jaimez Remix)",
+        artist: "Bad Bunny",
+        remixer: "Erick Jaimez",
+        bpm: 102,
+        date: "06/25",
+        tags: ["Cumbia", "WAV"],
+        url: "https://www.mediafire.com/file_premium/km7yvvybu68a0hq/Bad_Bunny_-_EoO_%2528Erick_Jaimez_Cumbia_Remix%2529.wav/file",
+        artwork: "https://imagizer.imageshack.com/img922/3086/7LXgHA.png",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "4",
+        title: "Raíces (Waránico Mix)",
+        artist: "Syztema",
+        remixer: "",
+        bpm: 132,
+        date: "06/25",
+        tags: ["Tribal", "MP3"],
+        url: "https://www.mediafire.com/file_premium/l4i9cf603hkj8z7/Rai%25CC%2581ces_%2528Wara%25CC%2581nico_Mix%2529.mp3/file",
+        artwork: "https://imagizer.imageshack.com/img924/9098/S31Mia.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "5",
+        title: "Indiana",
+        artist: "Fastez",
+        remixer: "",
+        bpm: 128,
+        date: "06/25",
+        tags: ["Tribal", "MP3"],
+        url: "https://www.mediafire.com/file_premium/272b2y735ozytoi/Indiana_-_Fastez.mp3/file",
+        artwork: "https://imagizer.imageshack.com/img923/930/zbhas9.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "6",
+        title: "All For You (Thisisnoicon Amapiano Edit)",
+        artist: "Janet Jackson",
+        remixer: "Thisisnoicon",
+        bpm: 114,
+        date: "06/25",
+        tags: ["Afro", "MP3"],
+        url: "https://www.mediafire.com/file_premium/cohyajq3qa2hds6/Janet_Jackson_-_All_For_You_%2528Thisisnoicon_Amapiano_Edit%2529.mp3/file",
+        artwork: "https://i1.sndcdn.com/artworks-aHo2yOsnW6QMInWK-iKkrtg-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "7",
+        title: "Suavemente (Remix Guarachero) ",
+        artist: "Elvis Crespo",
+        remixer: "XAVO",
+        bpm: 124,
+        date: "06/25",
+        tags: ["Tribal", "Guarachero", "MP3"],
+        url: "https://www.mediafire.com/file_premium/5s3e76zoxfvzxt0/Suavemente_%2528Remix_Guarachero%2529_XAVO.mp3/file",
+        artwork: "https://i1.sndcdn.com/artworks-itscr5sDu0y72wND-z2HRog-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "8",
+        title: "Sensual Shabba (Jordeaux & Sonia Sol Edit)",
+        artist: "A$AP Ferg",
+        remixer: "Jordeaux & Sonia Sol",
+        bpm: 128,
+        date: "06/25",
+        tags: ["House", "Vibe", "WAV"],
+        url: "https://www.mediafire.com/file_premium/6ifbfcrye5lylb9/SENSUAL_SHABBA_%2528House_Edit_Final_Version%2529.wav/file",
+        artwork: "https://i1.sndcdn.com/artworks-HXSrbeRNXCamBz0a-jyicnQ-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "9",
+        title: "Sonido De Arpa - DJ Mouse (KLPUYI REMIX)",
+        artist: "DJ Mouse",
+        remixer: "KLPUYI",
+        bpm: 132,
+        date: "06/25",
+        tags: ["Tribal", "MP3"],
+        url: "https://www.mediafire.com/file_premium/lprqnwev1ni8yva/Sonido_De_Arpa_-_DJ_Mouse_%2528KLPUYI_REMIX%2529.mp3/file",
+        artwork: "https://i1.sndcdn.com/artworks-4dDRsSVifkaXgLZN-K5hZdQ-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "10",
+        title: "Ramito De Violetas (Mexa House Remix)",
+        artist: "Mi Banda El Mexicano",
+        remixer: "Zhen Ross",
+        bpm: 126,
+        date: "06/25",
+        tags: ["House", "MP3"],
+        url: "https://www.mediafire.com/file_premium/0zbowf3apkm1svf/%2528126%2529_Zhen_Ross_-_Ramito_de_Violetas_%2528Mexa_House_Remix%2529_%255BExtended%255D.mp3/file",
+        artwork: "https://i1.sndcdn.com/artworks-y3sDTiax6xkU8qDT-0ojgAA-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "11",
+        title: "Después de la Playa (DIEGO ORTIZ PERREO SUCIO REMIX)",
+        artist: "Bad Bunny",
+        remixer: "Diego Ortiz",
+        bpm: 90,
+        date: "06/25",
+        tags: ["Reggaeton", "Perreo", "MP3"],
+        url: "https://www.mediafire.com/file_premium/9ef86khl1ytiqcv/DESPUE%25CC%2581S_DE_LA_PLAYA_%2528DIEGO_ORTIZ_PERREO_SUCIO_REMIX%2529.mp3/file",
+        artwork: "https://i1.sndcdn.com/artworks-1dPiHHMn31Y4Lj7a-9b5wsg-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      },
+      {
+        id: "12",
+        title: "K.O.",
+        artist: "DjGiovanni Rios",
+        remixer: "",
+        bpm: 132,
+        date: "06/25",
+        tags: ["Tribal", "House", "MP3"],
+        url: "https://www.mediafire.com/file_premium/t5ibkpiuu5ab16f/DjGiovanni_Rios_-_K.O..mp3/file",
+        artwork: "https://i1.sndcdn.com/avatars-HeqruBg4q1S5zyhd-wG7ZKg-t500x500.jpg",
+        spotifyUrl: "",
+        appleMusicUrl: ""
+      }
+    ];
+
+    // Extract all unique tags for quick filtering buttons
+    const allTags = [...new Set(tracks.flatMap(t => t.tags))];
+    
+    // Extract unique dates
+    const uniqueDates = [...new Set(tracks.map(track => track.date))].sort();
+
+    // Current audio player and track info
+    let currentAudio = new Audio();
+    let currentTrackId = null;
+    let currentTrackIndex = 0;
+    let isSeeking = false;
+
+    // --- FAVORITES STORAGE & UTILS ---
+    function saveFavorites() {
+      localStorage.setItem("favorites", JSON.stringify(favoriteFolders));
+    }
+
+    function loadFavorites() {
+      const saved = localStorage.getItem("favorites");
+      if (saved) {
+        favoriteFolders = JSON.parse(saved);
+        const folders = Object.keys(favoriteFolders);
+        activeFolder = folders.length ? folders[0] : null;
+        updateFavoriteFolderSelect();
+        renderFavorites();
+      } else {
+        // Create a default folder if none exist
+        favoriteFolders = {"Favorites": []};
+        activeFolder = "Favorites";
+        saveFavorites();
+        updateFavoriteFolderSelect();
+        renderFavorites();
+      }
+    }
+
+    // --- FAVORITE FOLDERS DROPDOWN ---
+    function updateFavoriteFolderSelect() {
+      favoriteFoldersSelect.innerHTML = "";
+      Object.keys(favoriteFolders).forEach((folder) => {
+        const option = document.createElement("option");
+        option.value = folder;
+        option.textContent = folder;
+        if (folder === activeFolder) option.selected = true;
+        favoriteFoldersSelect.appendChild(option);
+      });
+
+      deleteFolderBtn.disabled = !activeFolder;
+      renameFolderBtn.disabled = !activeFolder;
+    }
+
+    function changeActiveFolder(folderName) {
+      activeFolder = folderName || null;
+      renderFavorites();
+      renderTracks(filteredTracks());
+      updateFavoriteFolderSelect();
+      updatePlayerFavoriteButton();
+    }
+
+    function addFavoriteFolder() {
+      const name = document.getElementById("new-folder-name").value.trim();
+      if (!name) {
+        alert("Please enter a folder name.");
+        return;
+      }
+      if (favoriteFolders[name]) {
+        alert("Folder already exists.");
+        return;
+      }
+      favoriteFolders[name] = [];
+      activeFolder = name;
+      updateFavoriteFolderSelect();
+      renderFavorites();
+      renderTracks(filteredTracks());
+      saveFavorites();
+      document.getElementById("new-folder-name").value = "";
+      updatePlayerFavoriteButton();
+    }
+
+    function renameActiveFolder() {
+      if (!activeFolder) return;
+      const newName = prompt("Enter new folder name:", activeFolder);
+      if (!newName || newName.trim() === "") return;
+      if (newName === activeFolder) return; // no change
+      if (favoriteFolders[newName]) {
+        alert("A folder with that name already exists.");
+        return;
+      }
+
+      // Move the favorites to the new key
+      favoriteFolders[newName] = favoriteFolders[activeFolder];
+      delete favoriteFolders[activeFolder];
+      activeFolder = newName;
+      saveFavorites();
+      updateFavoriteFolderSelect();
+      renderFavorites();
+    }
+
+    function deleteActiveFolder() {
+      if (!activeFolder) return;
+      if (
+        confirm(`Are you sure you want to delete the folder "${activeFolder}"?`)
+      ) {
+        delete favoriteFolders[activeFolder];
+        activeFolder = Object.keys(favoriteFolders)[0] || null;
+        updateFavoriteFolderSelect();
+        renderFavorites();
+        renderTracks(filteredTracks());
+        saveFavorites();
+        updatePlayerFavoriteButton();
+      }
+    }
+
+    // --- FAVORITE TRACKS RENDERING ---
+    function renderFavorites() {
+      favoriteTracks.innerHTML = "";
+      if (!activeFolder) return;
+
+      const folder = favoriteFolders[activeFolder] || [];
+      folder.forEach((id) => {
+        const track = tracks.find((t) => t.id === id);
+        if (!track) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "favorite-track bg-gray-700 p-3 rounded flex justify-between items-center relative";
+        wrapper.style.transition = "background-color 0.2s";
+        if (currentTrackId === track.id) {
+          wrapper.classList.add("track-playing");
+        }
+
+        const left = document.createElement("div");
+        left.className = "flex items-center";
+        
+        // Artwork
+        const artwork = document.createElement("img");
+        artwork.src = track.artwork || placeholderArtwork;
+        artwork.className = "artwork";
+        artwork.alt = `${track.title} artwork`;
+        left.appendChild(artwork);
+        
+        const content = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "font-semibold truncate max-w-[180px]";
+        title.textContent = track.title;
+
+        const info = document.createElement("div");
+        info.className = "text-xs text-gray-300 truncate max-w-[180px]";
+        info.textContent = `${track.artist} | ${track.remixer} | ${track.date}`;
+
+        const tags = document.createElement("div");
+        tags.className = "text-xs text-amber-400 truncate max-w-[180px]";
+        tags.textContent = track.tags.join(', ');
+
+        content.appendChild(title);
+        content.appendChild(info);
+        content.appendChild(tags);
+        left.appendChild(content);
+
+        const actions = document.createElement("div");
+        actions.className = "track-actions flex space-x-2";
+
+        const playBtn = document.createElement("button");
+        playBtn.title = "Play";
+        playBtn.className = "icon-btn hover:text-blue-400";
+        playBtn.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+        `;
+        playBtn.onclick = () => playTrack(track.id);
+
+        const downloadBtn = document.createElement("button");
+        downloadBtn.title = "Download";
+        downloadBtn.className = "icon-btn hover:text-green-400";
+        downloadBtn.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        `;
+        downloadBtn.onclick = (e) => {
+          e.stopPropagation();
+          downloadTrack(track.id);
+        };
+
+        const removeBtn = document.createElement("button");
+        removeBtn.title = "Remove from favorites";
+        removeBtn.className = "icon-btn hover:text-red-400";
+        removeBtn.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        `;
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          removeFromFavorites(track.id);
+        };
+
+        actions.appendChild(playBtn);
+        actions.appendChild(downloadBtn);
+        actions.appendChild(removeBtn);
+
+        wrapper.appendChild(left);
+        wrapper.appendChild(actions);
+
+        favoriteTracks.appendChild(wrapper);
+      });
+      
+      // Update favorite count
+      favoriteCountEl.textContent = folder.length;
+    }
+
+    function addToFavorites(id) {
+      if (!activeFolder) {
+        alert("Please select or create a favorite folder first.");
+        return;
+      }
+      if (!favoriteFolders[activeFolder].includes(id)) {
+        favoriteFolders[activeFolder].push(id);
+        saveFavorites();
+        renderFavorites();
+        updatePlayerFavoriteButton();
+        // Also update the playlist to show the favorite status
+        renderTracks(filteredTracks());
+      }
+    }
+
+    function removeFromFavorites(id) {
+      if (!activeFolder) return;
+      favoriteFolders[activeFolder] = favoriteFolders[activeFolder].filter(
+        (tid) => tid !== id
+      );
+      saveFavorites();
+      renderFavorites();
+      updatePlayerFavoriteButton();
+      // Also update the playlist to show the favorite status
+      renderTracks(filteredTracks());
+    }
+
+    function isFavorite(id) {
+      return (
+        activeFolder &&
+        favoriteFolders[activeFolder] &&
+        favoriteFolders[activeFolder].includes(id)
+      );
+    }
+
+    // --- TRACKS RENDERING ---
+    function renderTracks(trackList) {
+      playlistEl.innerHTML = "";
+      
+      // Group tracks by date
+      const groupedTracks = {};
+      trackList.forEach(track => {
+        if (!groupedTracks[track.date]) {
+          groupedTracks[track.date] = [];
+        }
+        groupedTracks[track.date].push(track);
+      });
+      
+      // Sort dates in descending order
+      const sortedDates = Object.keys(groupedTracks).sort((a, b) => {
+        // Convert "MM/YY" to comparable format
+        const [aMonth, aYear] = a.split('/').map(Number);
+        const [bMonth, bYear] = b.split('/').map(Number);
+        return (bYear * 100 + bMonth) - (aYear * 100 + aMonth);
+      });
+      
+      // Render each group
+      sortedDates.forEach(date => {
+        // Create month header
+        const monthHeader = document.createElement("div");
+        monthHeader.className = "month-header";
+        monthHeader.textContent = formatDateHeader(date);
+        playlistEl.appendChild(monthHeader);
+        
+        // Render tracks for this date
+        groupedTracks[date].forEach(track => {
+          const row = document.createElement("div");
+          row.className = "p-3 border-b border-gray-700 cursor-pointer hover:bg-gray-700 flex justify-between items-center";
+          if (currentTrackId === track.id) {
+            row.classList.add("track-playing");
+          }
+
+          // Track info left
+          const left = document.createElement("div");
+          left.className = "flex items-center";
+          
+          // Artwork
+          const artwork = document.createElement("img");
+          artwork.src = track.artwork || placeholderArtwork;
+          artwork.className = "artwork";
+          artwork.alt = `${track.title} artwork`;
+          left.appendChild(artwork);
+          
+          const content = document.createElement("div");
+          content.className = "track-content";
+          const title = document.createElement("div");
+          title.className = "font-semibold flex items-center";
+          if (currentTrackId === track.id) {
+            const indicator = document.createElement("div");
+            indicator.className = "playing-indicator mr-2";
+            title.appendChild(indicator);
+          }
+          
+          // Highlight search term in title
+          const searchTerm = searchInput.value.trim().toLowerCase();
+          if (searchTerm) {
+            const regex = new RegExp(searchTerm, "gi");
+            const highlightedTitle = track.title.replace(regex, match => 
+              `<span class="search-highlight">${match}</span>`
+            );
+            title.innerHTML = highlightedTitle;
+          } else {
+            title.textContent = track.title;
+          }
+
+          const artistRemixer = document.createElement("div");
+          artistRemixer.className = "text-sm text-gray-300";
+          
+          // Highlight search term in artist/remixer
+          if (searchTerm) {
+            const regex = new RegExp(searchTerm, "gi");
+            const highlightedArtist = track.artist.replace(regex, match => 
+              `<span class="search-highlight">${match}</span>`
+            );
+            const highlightedRemixer = track.remixer.replace(regex, match => 
+              `<span class="search-highlight">${match}</span>`
+            );
+            artistRemixer.innerHTML = `${highlightedArtist} | ${highlightedRemixer}`;
+          } else {
+            artistRemixer.textContent = `${track.artist} | ${track.remixer}`;
+          }
+
+          const meta = document.createElement("div");
+          meta.className = "flex text-xs text-gray-400 space-x-3";
+          
+          // Highlight search term in tags
+          if (searchTerm) {
+            const regex = new RegExp(searchTerm, "gi");
+            const highlightedTags = track.tags.map(tag => 
+              tag.replace(regex, match => `<span class="search-highlight">${match}</span>`)
+            ).join(', ');
+            meta.innerHTML = `<span class="font-semibold text-amber-400">${track.bpm} BPM</span> <span class="text-blue-400">${highlightedTags}</span>`;
+          } else {
+            meta.innerHTML = `<span class="font-semibold text-amber-400">${track.bpm} BPM</span> <span class="text-blue-400">${track.tags.join(', ')}</span>`;
+          }
+
+          content.appendChild(title);
+          content.appendChild(artistRemixer);
+          content.appendChild(meta);
+          left.appendChild(content);
+
+          // Track info right
+          const right = document.createElement("div");
+          right.className = "flex items-center";
+
+          // Create a button group for core actions
+          const coreButtons = document.createElement("div");
+          coreButtons.className = "button-group";
+
+          // Play button
+          const playBtn = document.createElement("button");
+          playBtn.title = "Play/Pause";
+          playBtn.className = "icon-btn hover:text-amber-400";
+          if (currentTrackId === track.id && !currentAudio.paused) {
+            playBtn.innerHTML = `
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+            `;
+          } else {
+            playBtn.innerHTML = `
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            `;
+          }
+          playBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (currentTrackId === track.id) {
+              if (currentAudio.paused) currentAudio.play();
+              else currentAudio.pause();
+            } else {
+              playTrack(track.id);
+            }
+            updatePlayButtons();
+          };
+
+          // Favorite toggle button
+          const favBtn = document.createElement("button");
+          favBtn.title = "Add/Remove Favorite";
+          favBtn.className = "icon-btn hover:text-red-400";
+          if (isFavorite(track.id)) {
+            favBtn.innerHTML = `
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            `;
+          } else {
+            favBtn.innerHTML = `
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            `;
+          }
+          favBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (isFavorite(track.id)) removeFromFavorites(track.id);
+            else addToFavorites(track.id);
+            updatePlayButtons();
+          };
+
+          // Download button
+          const downloadBtn = document.createElement("button");
+          downloadBtn.title = "Download Track";
+          downloadBtn.className = "icon-btn hover:text-green-400";
+          downloadBtn.innerHTML = `
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          `;
+          downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            downloadTrack(track.id);
+          };
+
+          coreButtons.appendChild(playBtn);
+          coreButtons.appendChild(favBtn);
+          coreButtons.appendChild(downloadBtn);
+
+          // Create service buttons group
+          const serviceButtons = document.createElement("div");
+          serviceButtons.className = "service-buttons";
+
+          // Spotify button
+          if (track.spotifyUrl) {
+            const spotifyBtn = document.createElement("a");
+            spotifyBtn.href = track.spotifyUrl;
+            spotifyBtn.target = "_blank";
+            spotifyBtn.title = "Listen on Spotify";
+            spotifyBtn.className = "icon-btn hover:text-green-500";
+            spotifyBtn.innerHTML = '<i class="fab fa-spotify"></i>';
+            spotifyBtn.onclick = (e) => {
+              e.stopPropagation();
+            };
+            serviceButtons.appendChild(spotifyBtn);
+          }
+
+          // Apple Music button
+          if (track.appleMusicUrl) {
+            const appleBtn = document.createElement("a");
+            appleBtn.href = track.appleMusicUrl;
+            appleBtn.target = "_blank";
+            appleBtn.title = "Listen on Apple Music";
+            appleBtn.className = "icon-btn hover:text-white";
+            appleBtn.innerHTML = '<i class="fab fa-apple"></i>';
+            appleBtn.onclick = (e) => {
+              e.stopPropagation();
+            };
+            serviceButtons.appendChild(appleBtn);
+          }
+
+          right.appendChild(coreButtons);
+          if (serviceButtons.children.length > 0) {
+            right.appendChild(serviceButtons);
+          }
+
+          row.appendChild(left);
+          row.appendChild(right);
+
+          // Click row to play track
+          row.onclick = () => playTrack(track.id);
+
+          playlistEl.appendChild(row);
+        });
+      });
+      
+      // Update track count
+      trackCountEl.textContent = trackList.length;
+    }
+    
+    function formatDateHeader(dateStr) {
+      const months = ["January", "February", "March", "April", "May", "June", 
+                     "July", "August", "September", "October", "November", "December"];
+      const [month, year] = dateStr.split('/');
+      return `${months[parseInt(month) - 1]} 20${year}`;
+    }
+
+    // --- PLAY TRACK ---
+    function playTrack(id) {
+      const trackIndex = tracks.findIndex(t => t.id === id);
+      if (trackIndex === -1) return;
+      
+      currentTrackIndex = trackIndex;
+      currentTrackId = id;
+      
+      const track = tracks[trackIndex];
+      currentAudio.src = track.url;
+      currentAudio.playbackRate = parseFloat(playbackSpeed.value);
+      currentAudio.play();
+      
+      updatePlayerInfo();
+      updatePlayerFavoriteButton();
+      updatePlayButtons();
+    }
+
+    // --- UPDATE PLAYER INFO ---
+    function updatePlayerInfo() {
+      if (!currentTrackId) {
+        playerInfo.textContent = "No track playing";
+        playerArtist.textContent = "Select a track to play";
+        playerArtworkImg.src = placeholderArtwork;
+        playingIndicator.style.display = "none";
+        playerTime.textContent = "0:00 / 0:00";
+        playerBpm.textContent = "0 BPM";
+        playerTags.textContent = "";
+        return;
+      }
+      const track = tracks.find((t) => t.id === currentTrackId);
+      playerInfo.textContent = track.title;
+      playerArtist.textContent = `${track.artist} • ${track.remixer}`;
+      playerBpm.textContent = `${track.bpm} BPM`;
+      playerTags.textContent = track.tags.join(', ');
+      playingIndicator.style.display = "block";
+      
+      // Update player artwork
+      playerArtworkImg.src = track.artwork || placeholderArtwork;
+    }
+
+    function updatePlayerFavoriteButton() {
+      if (activeFolder && isFavorite(currentTrackId)) {
+        favoriteOutline.classList.add("hidden");
+        favoriteFilled.classList.remove("hidden");
+      } else {
+        favoriteOutline.classList.remove("hidden");
+        favoriteFilled.classList.add("hidden");
+      }
+    }
+
+    function updatePlayButtons() {
+      renderTracks(filteredTracks());
+      renderFavorites();
+      
+      if (!currentAudio.paused) {
+        playIcon.classList.add("hidden");
+        pauseIcon.classList.remove("hidden");
+      } else {
+        playIcon.classList.remove("hidden");
+        pauseIcon.classList.add("hidden");
+      }
+    }
+
+    // --- DOWNLOAD TRACK ---
+    function downloadTrack(id) {
+      const track = tracks.find((t) => t.id === id);
+      if (!track) return;
+      const a = document.createElement("a");
+      a.href = track.url;
+      a.download = `${track.artist} - ${track.title}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // --- SEARCH & FILTER ---
+    function filteredTracks() {
+      const term = searchInput.value.trim().toLowerCase();
+      
+      let filtered = tracks.filter((track) => {
+        // Check if matches search term
+        const matchesSearch = !term || 
+          track.title.toLowerCase().includes(term) ||
+          track.artist.toLowerCase().includes(term) ||
+          track.remixer.toLowerCase().includes(term) ||
+          track.tags.some((tag) => tag.toLowerCase().includes(term));
+        
+        // Check if matches selected tags
+        const matchesTags = selectedTags.length === 0 || 
+          selectedTags.every(tag => track.tags.includes(tag));
+        
+        // Check if matches date filter
+        const matchesDate = !selectedDate || track.date === selectedDate;
+        
+        return matchesSearch && matchesTags && matchesDate;
+      });
+
+      return filtered;
+    }
+
+    function toggleTagFilter(tag) {
+      if (selectedTags.includes(tag)) {
+        // Remove tag
+        selectedTags = selectedTags.filter(t => t !== tag);
+      } else {
+        // Add tag if we haven't reached the limit
+        if (selectedTags.length < 3) {
+          selectedTags.push(tag);
+        } else {
+          // Show message that max tags reached
+          tagLimitMessage.style.display = "inline-block";
+          setTimeout(() => {
+            tagLimitMessage.style.display = "none";
+          }, 2000);
+          return;
+        }
+      }
+      
+      // Hide limit message if we're below max
+      if (selectedTags.length < 3) {
+        tagLimitMessage.style.display = "none";
+      }
+      
+      renderSelectedTags();
+      renderTagButtons();
+      renderTracks(filteredTracks());
+    }
+
+    function renderSelectedTags() {
+      selectedTagsContainer.innerHTML = "";
+      selectedTags.forEach(tag => {
+        const token = document.createElement("span");
+        token.className = "tag-token";
+        token.innerHTML = `${tag} <button onclick="toggleTagFilter('${tag}')">✕</button>`;
+        selectedTagsContainer.appendChild(token);
+      });
+    }
+
+    function removeSelectedTag(tag) {
+      selectedTags = selectedTags.filter(t => t !== tag);
+      renderSelectedTags();
+      renderTagButtons();
+      renderTracks(filteredTracks());
+    }
+    
+    function filterByDate(date) {
+      selectedDate = date;
+      renderTracks(filteredTracks());
+      // Update active button
+      document.querySelectorAll('.date-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.date === date);
+      });
+    }
+
+    // --- TAG BUTTONS ---
+    function renderTagButtons() {
+      tagButtonsEl.innerHTML = "";
+      allTags.forEach((tag) => {
+        const btn = document.createElement("button");
+        btn.textContent = tag;
+        btn.className = selectedTags.includes(tag)
+          ? "bg-amber-600 px-3 py-1 rounded cursor-pointer hover:bg-amber-700 transition-colors tag-btn"
+          : "bg-gray-700 px-3 py-1 rounded cursor-pointer hover:bg-amber-600 transition-colors tag-btn";
+        btn.onclick = () => {
+          toggleTagFilter(tag);
+        };
+        tagButtonsEl.appendChild(btn);
+      });
+    }
+    
+    // --- DATE FILTER BUTTONS ---
+    function renderDateFilters() {
+      // Add "All Dates" button
+      const allBtn = document.createElement("button");
+      allBtn.className = "date-btn active";
+      allBtn.dataset.date = "";
+      allBtn.textContent = "All";
+      allBtn.onclick = () => filterByDate("");
+      dateFilters.appendChild(allBtn);
+      
+      // Add buttons for each date
+      uniqueDates.forEach(date => {
+        const btn = document.createElement("button");
+        btn.className = "date-btn";
+        btn.dataset.date = date;
+        btn.textContent = date;
+        btn.onclick = () => filterByDate(date);
+        dateFilters.appendChild(btn);
+      });
+    }
+
+    // --- PROGRESS BAR & TIME DISPLAY ---
+    currentAudio.addEventListener("timeupdate", () => {
+      if (!isSeeking && currentAudio.duration) {
+        const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+        progressBar.value = progress;
+
+        // Update player time display (current / total)
+        playerTime.textContent = formatTime(currentAudio.currentTime) + " / " + formatTime(currentAudio.duration);
+      }
+    });
+
+    progressBar.addEventListener("input", () => {
+      isSeeking = true;
+    });
+
+    progressBar.addEventListener("change", () => {
+      if (currentAudio.duration) {
+        currentAudio.currentTime = (progressBar.value / 100) * currentAudio.duration;
+      }
+      isSeeking = false;
+    });
+
+    playerToggle.addEventListener("click", () => {
+      if (!currentTrackId) {
+        if (tracks.length) playTrack(tracks[0].id);
+      } else if (currentAudio.paused) {
+        currentAudio.play();
+      } else {
+        currentAudio.pause();
+      }
+      updatePlayButtons();
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      currentAudio.volume = volumeSlider.value;
+      volumePercentage.textContent = Math.round(volumeSlider.value * 100) + '%';
+    });
+
+    playbackSpeed.addEventListener("change", () => {
+      currentAudio.playbackRate = parseFloat(playbackSpeed.value);
+    });
+
+    currentAudio.addEventListener("ended", () => {
+      updatePlayButtons();
+    });
+
+    playerFavorite.addEventListener("click", () => {
+      if (!currentTrackId) {
+        alert("No track is currently playing.");
+        return;
+      }
+      if (isFavorite(currentTrackId)) {
+        removeFromFavorites(currentTrackId);
+      } else {
+        addToFavorites(currentTrackId);
+      }
+    });
+    
+    playerDownload.addEventListener("click", () => {
+      if (currentTrackId) {
+        downloadTrack(currentTrackId);
+      }
+    });
+
+    // Format seconds as mm:ss
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds === Infinity) return "0:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return m + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    // --- INIT ---
+    loadFavorites();
+    renderTracks(tracks);
+    renderTagButtons();
+    renderDateFilters();
+    
+    // Set initial volume
+    currentAudio.volume = volumeSlider.value;
+    volumePercentage.textContent = Math.round(volumeSlider.value * 100) + '%';
+    
+    // Setup search functionality
+    searchInput.addEventListener('input', function() {
+      renderTracks(filteredTracks());
+      clearSearchBtn.style.display = this.value.trim() ? "block" : "none";
+    });
+    
+    clearSearchBtn.onclick = () => {
+      searchInput.value = "";
+      renderTracks(filteredTracks());
+      clearSearchBtn.style.display = "none";
+    };
+  </script>
+</body>
+</html>
